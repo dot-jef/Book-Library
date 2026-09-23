@@ -17,7 +17,14 @@ searchForm.addEventListener("submit", async (e) => {
 
   const books = data.docs;
 
-  books.forEach(book => {
-    app.insertAdjacentHTML("beforeend",`<h1>${(book.author_name)}</h1>`);
-  });
+  for (let i = 0; i < 10; i++) {
+    app.insertAdjacentHTML("beforeend",`
+      <div class="book-container">
+        <img src="https://covers.openlibrary.org/b/id/${books[i].cover_i}-L.jpg" class="cover">
+        <h1 class="title">${books[i].title || "N/A"}</h1>
+        <h3 class="author-name">${books[i].author_name || "N/A"}</h3>
+        <h3 class="year-published">${books[i].first_publish_year || "N/A"}</h3>
+      </div>`);
+  }
+  console.log(books);
 });
