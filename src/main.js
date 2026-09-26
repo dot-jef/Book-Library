@@ -14,10 +14,20 @@ searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const formData = new FormData(searchForm);
 
+  let input = formData.get("search-name");
+  
+  input = input.trim().replace(/\s+/g, " ");
+  if (!input) {
+    return;
+  }
+
   displayLoadingScreen();
 
   try {
-    const response = await fetch(`https://openlibrary.org/search.json?q=${formData.get("search-name")}`)
+    const url = new URL("https://openlibrary.org/search.json?");
+    url.searchParams.set("q", input);
+
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error("Unable to fetch properly");
