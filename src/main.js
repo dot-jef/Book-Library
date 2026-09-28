@@ -6,9 +6,14 @@ app.innerHTML = `
     <button type="submit">Search</button>
   </form>
   <div id="books-display"></div>
+  <button id="load-more" hidden>Load More</button>
 `
 const searchForm = document.getElementById("search-form");
 const booksDisplay = document.getElementById("books-display");
+const loadMoreBtn = document.getElementById("load-more");
+let currentURL = "";
+let currentOffset = 
+
 
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -26,7 +31,9 @@ searchForm.addEventListener("submit", async (e) => {
   try {
     const url = new URL("https://openlibrary.org/search.json?");
     url.searchParams.set("q", input);
-
+    url.searchParams.set("limit", 10);
+    
+    currentURL = url;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -45,19 +52,23 @@ searchForm.addEventListener("submit", async (e) => {
           <h3 class="year-published">${books[i].first_publish_year || "N/A"}</h3>
         </div>`;
     }
-    console.log(response);
+    console.log(data);
 
     if (books.length === 0) {
+      loadMoreBtn.setAttribute("hidden", "");
       booksDisplay.innerHTML = `<h1 class="empty-state" role="status" aria-live="polite">No Books Found</h1>`;
+    } else {
+      loadMoreBtn.removeAttribute("hidden");
     }
   } catch (error) {
     console.error("Error found: ", error.message);
     booksDisplay.innerHTML = `<h1 class="error-state" role="alert">Something Went Wrong</h1>`;
   }
-  
-  
 });
 
+loadMoreBtn.addEventListener("click", () => {
+
+});
 
 function displayLoadingScreen() {
   booksDisplay.innerHTML = `<h1 class="loading-state" role="status" aria-live="polite">Loading...</h1>`;

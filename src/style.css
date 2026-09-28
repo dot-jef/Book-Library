@@ -1,6 +1,16 @@
+body {
+	margin: 0;
+}
+
+#app {
+	width: 100%;
+	max-width: 120rem;
+	margin: 0 auto;
+}
+
 .book-container {
-	width: min(100%, 22rem);
-	margin: 2rem auto;
+	width: auto;
+	margin: 0;
 	padding: 1.5rem;
 	border: 1px solid #d9e2ec;
 	border-radius: 12px;
@@ -8,6 +18,15 @@
 	box-shadow: 0 8px 24px rgba(31, 52, 73, 0.1);
 	color: #243b53;
 	text-align: center;
+}
+
+#books-display {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	align-items: start;
+	gap: 1.5rem;
+	width: min(calc(100% - 2rem), 120rem);
+	margin: 2rem auto;
 }
 
 .cover {
@@ -44,10 +63,13 @@ form {
 
 .loading-state {
 	display: flex;
+	grid-column: 1 / -1;
 	align-items: center;
 	justify-content: center;
 	gap: 0.75rem;
-	width: min(100% - 2rem, 22rem);
+	justify-self: center;
+	width: min(calc(100% - 2rem), 22rem);
+	box-sizing: border-box;
 	min-height: 8rem;
 	margin: 2rem auto;
 	border: 1px solid #d9e2ec;
@@ -77,10 +99,13 @@ form {
 
 .empty-state {
 	display: flex;
+	grid-column: 1 / -1;
 	align-items: center;
 	justify-content: center;
 	gap: 0.75rem;
-	width: min(100% - 2rem, 22rem);
+	justify-self: center;
+	width: min(calc(100% - 2rem), 22rem);
+	box-sizing: border-box;
 	min-height: 8rem;
 	margin: 2rem auto;
 	border: 1px dashed #bcccdc;
@@ -102,10 +127,13 @@ form {
 
 .error-state {
 	display: flex;
+	grid-column: 1 / -1;
 	align-items: center;
 	justify-content: center;
 	gap: 0.75rem;
-	width: min(100% - 2rem, 22rem);
+	justify-self: center;
+	width: min(calc(100% - 2rem), 22rem);
+	box-sizing: border-box;
 	min-height: 8rem;
 	margin: 2rem auto;
 	border: 1px solid #f2b8b5;
@@ -157,8 +185,35 @@ button:hover {
 	background: #2167c1;
 }
 
+#load-more:not([hidden]) {
+	display: block;
+	margin: 2rem auto;
+}
+
 @media (max-width: 30rem) {
 	form {
 		flex-direction: column;
+	}
+
+	#books-display {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (min-width: 30.01rem) and (max-width: 50rem) {
+	#books-display {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 50.01rem) and (max-width: 75rem) {
+	#books-display {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 75.01rem) and (max-width: 100rem) {
+	#books-display {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 }
