@@ -12,6 +12,7 @@ const searchForm = document.getElementById("search-form");
 const booksDisplay = document.getElementById("books-display");
 const loadMoreBtn = document.getElementById("load-more");
 let currentURL = "";
+let booksDisplayCount = 0;
 
 searchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -40,6 +41,7 @@ searchForm.addEventListener("submit", async (e) => {
     }
     const data = await response.json();
     const books = data.docs;
+    booksDisplayCount = books.length;
 
     booksDisplay.innerHTML = "";
     for (let i = 0; i < books.length; i++) { 
@@ -53,9 +55,11 @@ searchForm.addEventListener("submit", async (e) => {
     }
     console.log(data);
 
-    if (books.length === 0) {
+    if (data.numFound === 0) {
       loadMoreBtn.setAttribute("hidden", "");
       booksDisplay.innerHTML = `<h1 class="empty-state" role="status" aria-live="polite">No Books Found</h1>`;
+    } else if (data.numFound <= 10) {
+      loadMoreBtn.setAttribute("hidden", "");
     } else {
       loadMoreBtn.removeAttribute("hidden");
     }
@@ -66,8 +70,9 @@ searchForm.addEventListener("submit", async (e) => {
 });
 
 loadMoreBtn.addEventListener("click", async () => {
-  const currentPage = Number(currentURL.searchParams.get("page"));
+  loadMoreBtn.setAttribute("disabled", "");
 
+  const currentPage = Number(currentURL.searchParams.get("page"));
   currentURL.searchParams.set("page", currentPage + 1);
 
   try {
@@ -77,23 +82,26 @@ loadMoreBtn.addEventListener("click", async () => {
     }
     const data = await response.json();
     const books = data.docs;
+    booksDisplayCount += books.length;
 
-    if (books.length === 0) {
-      loadMoreBtn.removeAttribute("hidden");
-    } else {
-      for (let i = 0; i < books.length; i++) { 
-        booksDisplay.innerHTML += `
-          <div class="book-container">
-            <img src=${books[i].cover_i ? `https://covers.openlibrary.org/b/id/${books[i].cover_i}-L.jpg` : "/assets/No_Image_Available.jpg"} class="cover">
-            <h1 class="title">${books[i].title || "N/A"}</h1>
-            <h3 class="author-name">${books[i].author_name || "N/A"}</h3>
-            <h3 class="year-published">${books[i].first_publish_year || "N/A"}</h3>
-          </div>`;
-      }
+    if (booksDisplayCount >= data.numFound) {
+      loadMoreBtn.setAttribute("hidden", "");
+    }
+
+    for (let i = 0; i < books.length; i++) { 
+      booksDisplay.innerHTML += `
+        <div class="book-container">
+          <img src=${books[i].cover_i ? `https://covers.openlibrary.org/b/id/${books[i].cover_i}-L.jpg` : "/assets/No_Image_Available.jpg"} class="cover">
+          <h1 class="title">${books[i].title || "N/A"}</h1>
+          <h3 class="author-name">${books[i].author_name || "N/A"}</h3>
+          <h3 class="year-published">${books[i].first_publish_year || "N/A"}</h3>
+        </div>`;
     }
     
   } catch (error) {
     console.error("Error loading more books:", error.message);
+  } finally {
+    loadMoreBtn.removeAttribute("disabled");
   }
 
 });
