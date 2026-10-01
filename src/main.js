@@ -7,6 +7,31 @@ app.innerHTML = `
   </form>
   <div id="books-display"></div>
   <button id="load-more" hidden>Load More</button>
+
+  <div class="book-details-modal" hidden>
+    <div class="book-details-backdrop"></div>
+    <section class="book-details-container" role="dialog" aria-modal="true" aria-labelledby="book-details-title">
+        <button class="book-details-close" type="button" aria-label="Close book details">&times;</button>
+        <div class="book-details-cover-wrap">
+            <img src="" alt="" class="cover">
+        </div>
+        <div class="book-details-content">
+            <p class="book-details-eyebrow">Book details</p>
+            <h1 class="book-title" id="book-details-title"></h1>
+            <p class="author-name"></p>
+            <div class="book-details-facts">
+                <div>
+                    <span>First published</span>
+                    <strong class="first-published-year"></strong>
+                </div>
+                <div>
+                    <span>Language</span>
+                    <strong class="language"></strong>
+                </div>
+            </div>
+        </div>
+    </section>
+  </div>
 `
 const searchForm = document.getElementById("search-form");
 const booksDisplay = document.getElementById("books-display");
@@ -44,9 +69,10 @@ searchForm.addEventListener("submit", async (e) => {
     booksDisplayCount = books.length;
 
     booksDisplay.innerHTML = "";
-    for (let i = 0; i < books.length; i++) { 
+    for (let i = 0; i < books.length; i++) {
+      const cleanKey = books[i].key.replace(/^\/works\//, "");
       booksDisplay.innerHTML += `
-        <div class="book-container">
+        <div data-id="${cleanKey}" class="book-container">
           <img src=${books[i].cover_i ? `https://covers.openlibrary.org/b/id/${books[i].cover_i}-L.jpg` : "/assets/No_Image_Available.jpg"} class="cover">
           <h1 class="title">${books[i].title || "N/A"}</h1>
           <h3 class="author-name">${books[i].author_name || "N/A"}</h3>
@@ -89,8 +115,9 @@ loadMoreBtn.addEventListener("click", async () => {
     }
 
     for (let i = 0; i < books.length; i++) { 
+      const cleanKey = books[i].key.replace(/^\/works\//, "");
       booksDisplay.innerHTML += `
-        <div class="book-container">
+        <div data-id="${cleanKey}" class="book-container">
           <img src=${books[i].cover_i ? `https://covers.openlibrary.org/b/id/${books[i].cover_i}-L.jpg` : "/assets/No_Image_Available.jpg"} class="cover">
           <h1 class="title">${books[i].title || "N/A"}</h1>
           <h3 class="author-name">${books[i].author_name || "N/A"}</h3>
@@ -103,6 +130,15 @@ loadMoreBtn.addEventListener("click", async () => {
   } finally {
     loadMoreBtn.removeAttribute("disabled");
   }
+
+});
+
+// TODO: continue the event delegation for the specific book details
+booksDisplay.addEventListener("click", (e) => {
+  const targetBook = e.target.closest("book-container");
+  const targetBookKey = targetBook.dataset.id;
+
+
 
 });
 

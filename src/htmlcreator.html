@@ -16,3 +16,28 @@
 <h1 class="empty-state" role="status" aria-live="polite">No Book Found</h1>
 
 <h1 class="error-state" role="alert">Something Went Wrong</h1>
+
+<div class="book-details-modal">
+    <div class="book-details-backdrop"></div>
+    <section class="book-details-container" role="dialog" aria-modal="true" aria-labelledby="book-details-title">
+        <button class="book-details-close" type="button" aria-label="Close book details">&times;</button>
+        <div class="book-details-cover-wrap">
+            <img src="" alt="" class="cover">
+        </div>
+        <div class="book-details-content">
+            <p class="book-details-eyebrow">Book details</p>
+            <h1 class="book-title" id="book-details-title"></h1>
+            <p class="author-name"></p>
+            <div class="book-details-facts">
+                <div>
+                    <span>First published</span>
+                    <strong class="first-published-year"></strong>
+                </div>
+                <div>
+                    <span>Language</span>
+                    <strong class="language"></strong>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
