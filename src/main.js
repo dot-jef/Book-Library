@@ -41,6 +41,7 @@ const booksDisplay = document.getElementById("books-display");
 const loadMoreBtn = document.getElementById("load-more");
 const bookDetailsModal = document.querySelector(".book-details-modal");
 const bookModalClose = bookDetailsModal.querySelector(".book-details-close");
+const bookCover = bookDetailsModal.querySelector(".cover");
 const bookTitle = bookDetailsModal.querySelector(".book-title");
 const bookAuthor = bookDetailsModal.querySelector(".author-name")
 const firstPublishedYear = bookDetailsModal.querySelector(".first-published-year");
@@ -82,15 +83,18 @@ searchForm.addEventListener("submit", async (e) => {
     booksDisplay.innerHTML = "";
     for (let i = 0; i < books.length; i++) {
       const cleanKey = books[i].key.replace(/^\/works\//, "");
+      const authors = books[i].author_name || [];
+      const languages = books[i].language || [];
+      const coverId = books[i].cover_i;
       booksDisplay.innerHTML += `
         <div data-id="${cleanKey}" class="book-container">
-          <img src="${books[i].cover_i ? `${baseCoverURL}/id/${books[i].cover_i}-L.jpg` : '/assets/No_Image_Available.jpg'}" class="cover">
+          <img data-cover="${coverId}" src="${coverId ? `${baseCoverURL}/id/${coverId}-L.jpg` : '/assets/No_Image_Available.jpg'}" class="cover">
           <h1 class="title">${books[i].title || "N/A"}</h1>
-          <h3 data-authors='${JSON.stringify(books[i].author_name)}' class="author-name">${books[i].author_name?.length > 1 ? books[i].author_name[0] + " et al." : books[i].author_name[0] || "N/A"}</h3>
-          <h3 data-year="${books[i].first_publish_year}" class="year-published">${books[i].first_publish_year || "N/A"}</h3>
+          <h3 data-authors='${JSON.stringify(authors)}' class="author-name">${authors.length > 1 ? authors[0] + " et al." : authors[0] || "N/A"}</h3>
+          <h3 data-year="${books[i].first_publish_year || "N/A"}" class="year-published">${books[i].first_publish_year || "N/A"}</h3>
+          <h3 data-languages='${JSON.stringify(languages)}' class="languages" hidden></h3>
         </div>`;
     }
-    console.log(data);
 
     if (data.numFound === 0) {
       loadMoreBtn.setAttribute("hidden", "");
@@ -127,12 +131,16 @@ loadMoreBtn.addEventListener("click", async () => {
 
     for (let i = 0; i < books.length; i++) { 
       const cleanKey = books[i].key.replace(/^\/works\//, "");
+      const authors = books[i].author_name || [];
+      const languages = books[i].language || [];
+      const coverId = books[i].cover_i;
       booksDisplay.innerHTML += `
         <div data-id="${cleanKey}" class="book-container">
-          <img src="${books[i].cover_i ? `${baseCoverURL}/id/${books[i].cover_i}-L.jpg` : '/assets/No_Image_Available.jpg'}" class="cover">
+          <img data-cover="${coverId}" src="${coverId ? `${baseCoverURL}/id/${coverId}-L.jpg` : '/assets/No_Image_Available.jpg'}" class="cover">
           <h1 class="title">${books[i].title || "N/A"}</h1>
-          <h3 data-authors='${JSON.stringify(books[i].author_name)}' class="author-name">${books[i].author_name?.length > 1 ? books[i].author_name[0] + " et al." : books[i].author_name[0] || "N/A"}</h3>
-          <h3 data-year="${books[i].first_publish_year}" class="year-published">${books[i].first_publish_year || "N/A"}</h3>
+          <h3 data-authors='${JSON.stringify(authors)}' class="author-name">${authors.length > 1 ? authors[0] + " et al." : authors[0] || "N/A"}</h3>
+          <h3 data-year="${books[i].first_publish_year || "N/A"}" class="year-published">${books[i].first_publish_year || "N/A"}</h3>
+          <h3 data-languages='${JSON.stringify(languages)}' class="languages" hidden></h3>
         </div>`;
     }
     
@@ -150,20 +158,22 @@ booksDisplay.addEventListener("click", async (e) => {
   if (targetBook) {
   const targetBookKey = targetBook.dataset.id;
     try {
-      // TODO: target the actual element for authors, year and language
-      const authors = JSON.parse(targetBook.dataset.authors);
+      const authors = JSON.parse(targetBook.querySelector(".author-name").dataset.authors) || [];
+      const languages = JSON.parse(targetBook.querySelector(".languages").dataset.languages) || [];
+      const coverId = targetBook.querySelector(".cover").dataset.cover;
+      const coverURL = coverId ? `${baseCoverURL}/id/${coverId}-L.jpg` : "/assets/No_Image_Available.jpg";
 
       const response = await fetch(`${baseURL}/works/${targetBookKey}.json`);
       if (!response.ok) {
         throw new Error("Cannot get book details");
       }
       const data = await response.json();
-      console.log(data);
 
-      bookTitle.textContent = data.title;
+      bookCover.setAttribute("src", coverURL);
+      bookTitle.textContent = data.title || "N/A";
       bookAuthor.textContent = authors.join(", ");
-      firstPublishedYear.textContent = targetBook.dataset.year;
-      language.textContent = "";
+      firstPublishedYear.textContent = targetBook.querySelector(".year-published").dataset.year;
+      language.textContent = languages.join(", ");
       bookDetailsModal.removeAttribute("hidden");
     } catch (error) {
       console.error("Error loading book details:", error.message);
